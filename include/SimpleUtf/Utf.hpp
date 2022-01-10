@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cuchar>
-
 #include <string>
 #include <iterator>
 #include <type_traits>
