@@ -31,8 +31,8 @@ add_compile_options(
 	"$<$<CONFIG:Release>:${RELEASE_OPTIONS}>"
 )
 
-set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_CXX_STANDARD 20)
+OPTION(SIMPLEUTF_TEST_CXX_STANDARD
+	"C++ standard version used to build SimpleUtf test executable." 11)
 
 ################################################################################
 # Fetching dependencise
@@ -58,3 +58,9 @@ file(GLOB_RECURSE SOURCES ${SOURCES_DIR_PATH}/*.[ch]*)
 add_executable(SimpleUtf_test ${SOURCES})
 
 target_link_libraries(SimpleUtf_test SimpleUtf gtest)
+
+add_test(NAME SimpleUtf_test
+	COMMAND SimpleUtf_test)
+
+set_property(TARGET SimpleUtf_test
+	PROPERTY CXX_STANDARD ${SIMPLEUTF_TEST_CXX_STANDARD})

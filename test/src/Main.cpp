@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 	constexpr size_t EXPECTED_NUM_OF_TEST_FILE = 1;
 
 	std::cout << "===== SimpleUtf test program =====" << std::endl;
+	std::cout << "C++ version: " << __cplusplus << std::endl;
 	std::cout << std::endl;
 
 	std::cout << std::endl;

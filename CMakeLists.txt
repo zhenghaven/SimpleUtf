@@ -21,5 +21,6 @@ add_library(SimpleUtf INTERFACE)
 target_include_directories(SimpleUtf INTERFACE include)
 
 if(${SIMPLEUTF_TEST})
+	enable_testing()
 	add_subdirectory(test)
 endif(${SIMPLEUTF_TEST})
