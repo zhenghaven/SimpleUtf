@@ -17,7 +17,8 @@ namespace SIMPLEUtf_CUSTOMIZED_NAMESPACE
 		template<bool B, class T = void>
 		using EnableIfT = typename std::enable_if<B,T>::type;
 
-#if __cplusplus < 201703L && defined(_HAS_DEPRECATED_RESULT_OF) && _HAS_DEPRECATED_RESULT_OF
+#if (!defined(_MSC_VER) && __cplusplus < 201703L) || \
+	(defined(_HAS_DEPRECATED_RESULT_OF) && _HAS_DEPRECATED_RESULT_OF)
 		template<class F, class... ArgTypes>
 		using InvokeResult = std::result_of<F(ArgTypes...)>;
 #else
