@@ -149,8 +149,8 @@ inline void CodePtToUtf16Once(char32_t val, OutputIt oit)
 	{
 		char32_t code = (val - 0x10000U);
 
-		resUtf[0] = 0xD800 | (code >> 10);
-		resUtf[1] = 0xDC00 | (code & 0x3FF);
+		resUtf[0] = static_cast<char16_t>(0xD800U | (code >> 10));
+		resUtf[1] = static_cast<char16_t>(0xDC00U | (code & 0x3FFU));
 
 		std::copy(std::begin(resUtf), std::end(resUtf), oit);
 	}

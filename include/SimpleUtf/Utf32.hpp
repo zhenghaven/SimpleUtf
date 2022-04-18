@@ -29,15 +29,16 @@ inline std::pair<char32_t, InputIt> Utf32ToCodePtOnce(InputIt begin, InputIt end
 	auto uval = Internal::BitCast2Unsigned(*begin);
 	++begin;
 	Internal::EnsureByteSize<4>(uval);
+	char32_t uval4B = static_cast<char32_t>(uval);
 
-	if(!Internal::IsValidCodePt(uval))
+	if(!Internal::IsValidCodePt(uval4B))
 	{
 		throw UtfConversionException("Invalid Encoding" " - "
 			"Invalid UTF-32 bytes.");
 	}
 
 	return std::make_pair(
-		static_cast<char32_t>(uval),
+		uval4B,
 		begin
 	);
 }

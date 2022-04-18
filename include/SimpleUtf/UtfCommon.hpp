@@ -393,7 +393,12 @@ struct AsciiTraitsImpl<_ValType, false>
 
 	static constexpr bool IsAscii(const _ValType& val)
 	{
-		return (val & 0x80U) == 0;
+		// 0011 1000 0110 ~
+		// 1100 0111 1001 | 0x7FU
+		// 1100 0111 1111 ~
+		// 0011 1000 0000 == 0
+		// false
+		return (~(~val | 0x7FU)) == 0;
 	}
 
 	static constexpr bool IsAsciiFast(const _ValType& val)
@@ -475,13 +480,28 @@ struct AsciiTraits :
 		Internal::IsSigned<_ValType>::value>
 {}; // struct AsciiTraits
 
-static_assert(AsciiTraits<uint8_t>::IsAscii('\0'), "Programming Error");
-static_assert(AsciiTraits<uint8_t>::IsAscii('\n'), "Programming Error");
-static_assert(AsciiTraits<uint8_t>::IsAscii('a'), "Programming Error");
-static_assert(AsciiTraits<uint8_t>::IsAscii('\x7f'), "Programming Error");
-static_assert(!AsciiTraits<uint8_t>::IsAscii('\x80'), "Programming Error");
+// IsAscii - Unsigned
+static_assert(AsciiTraits<uint8_t>::IsAscii(static_cast<uint8_t>('\0')),
+	"Programming Error");
+static_assert(AsciiTraits<uint8_t>::IsAscii(static_cast<uint8_t>('\n')),
+	"Programming Error");
+static_assert(AsciiTraits<uint8_t>::IsAscii(static_cast<uint8_t>('a')),
+	"Programming Error");
+static_assert(AsciiTraits<uint8_t>::IsAscii(static_cast<uint8_t>('\x7f')),
+	"Programming Error");
+static_assert(!AsciiTraits<uint8_t>::IsAscii(static_cast<uint8_t>('\x80')),
+	"Programming Error");
 static_assert(!AsciiTraits<uint8_t>::IsAscii(static_cast<uint8_t>(~0)),
 	"Programming Error");
+
+static_assert(!AsciiTraits<uint32_t>::IsAscii(0x0080U),
+	"Programming Error");
+static_assert(!AsciiTraits<uint32_t>::IsAscii(0x0100U),
+	"Programming Error");
+static_assert(!AsciiTraits<uint32_t>::IsAscii(0x0101U),
+	"Programming Error");
+
+// IsAsciiFast - Signed
 static_assert(AsciiTraits<char>::IsAsciiFast('\0'), "Programming Error");
 static_assert(AsciiTraits<char>::IsAsciiFast('\n'), "Programming Error");
 static_assert(AsciiTraits<char>::IsAsciiFast('a'), "Programming Error");
@@ -489,15 +509,19 @@ static_assert(AsciiTraits<char>::IsAsciiFast('\x7f'), "Programming Error");
 static_assert(!AsciiTraits<char>::IsAsciiFast('\x80'), "Programming Error");
 static_assert(!AsciiTraits<char>::IsAsciiFast(static_cast<char>(~0)),
 	"Programming Error");
+
 static_assert(AsciiTraits<int32_t>::IsAsciiFast('\0'), "Programming Error");
 static_assert(AsciiTraits<int32_t>::IsAsciiFast('\n'), "Programming Error");
 static_assert(!AsciiTraits<int32_t>::IsAsciiFast(-1), "Programming Error");
 static_assert(!AsciiTraits<int32_t>::IsAsciiFast(0x0100),
 	"Programming Error");
 
+// IsAByte - unsigned
 static_assert(AsciiTraits<uint32_t>::IsAByte(0x00FFU), "Programming Error");
 static_assert(!AsciiTraits<uint32_t>::IsAByte(0xFF00U),
 	"Programming Error");
+
+// IsAByte - signed
 static_assert(AsciiTraits<char>::IsAByte(static_cast<char>(~0)),
 	"Programming Error");
 static_assert(AsciiTraits<char>::IsAByte(static_cast<char>(-1)),
@@ -509,16 +533,20 @@ static_assert(!AsciiTraits<int32_t>::IsAByte(0x01FF), "Programming Error");
 static_assert(!AsciiTraits<int32_t>::IsAByte(~0x00FF), "Programming Error");
 static_assert(!AsciiTraits<int32_t>::IsAByte(-1), "Programming Error");
 
-static_assert(AsciiTraits<uint8_t>::IsPrintable('a'), "Programming Error");
-static_assert(AsciiTraits<uint8_t>::IsPrintable(' '), "Programming Error");
-static_assert(AsciiTraits<uint8_t>::IsPrintable('~'), "Programming Error");
-static_assert(!AsciiTraits<uint8_t>::IsPrintable('\0'),
+// IsPrintable - unsigned
+static_assert(AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>('a')),
 	"Programming Error");
-static_assert(!AsciiTraits<uint8_t>::IsPrintable('\n'),
+static_assert(AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>(' ')),
 	"Programming Error");
-static_assert(!AsciiTraits<uint8_t>::IsPrintable('\x7f'),
+static_assert(AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>('~')),
 	"Programming Error");
-static_assert(!AsciiTraits<uint8_t>::IsPrintable('\x80'),
+static_assert(!AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>('\0')),
+	"Programming Error");
+static_assert(!AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>('\n')),
+	"Programming Error");
+static_assert(!AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>('\x7f')),
+	"Programming Error");
+static_assert(!AsciiTraits<uint8_t>::IsPrintable(static_cast<uint8_t>('\x80')),
 	"Programming Error");
 
 } // namespace SimpleUtf
