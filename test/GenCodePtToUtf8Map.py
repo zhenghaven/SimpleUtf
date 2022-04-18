@@ -1,4 +1,11 @@
-#!/bin/python3
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+###
+# Copyright (c) 2022 Haofan Zheng
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+###
 
 TEST_RANGE = 255
 TEST_BEGINS = [0x00, 0x800, 0xD700, 0xD800, 0xD900, 0xDC00, 0xDE00, 0xDF00, 0xE000, 0x10000, 0x10FF00]
