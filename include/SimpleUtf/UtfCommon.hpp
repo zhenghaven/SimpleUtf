@@ -350,6 +350,17 @@ inline _ValType EnsureByteSize(const _ValType& val)
 				+ std::to_string(_Bytes) + " bytes");
 }
 
+/**
+ * @brief shorthand for getting value_type of a iterator
+ *
+ */
+template<typename _ItType>
+using ItValType = typename std::iterator_traits<_ItType>::value_type;
+
+/**
+ * @brief Can type _ValType hold value that has size of _ByteSize?
+ *
+ */
 template<typename _ValType, size_t _ByteSize>
 using CanTHold = typename std::conditional<
 	ByteCeiling(std::numeric_limits<_ValType>::digits) >= _ByteSize,
