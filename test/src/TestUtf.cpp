@@ -1,3 +1,8 @@
+// Copyright (c) 2022 Haofan Zheng
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
 #include <cstring>
 
 #include <gtest/gtest.h>
@@ -25,62 +30,91 @@ GTEST_TEST(TestUtf, CountTestFile)
 
 GTEST_TEST(TestUtf, CalcNumBits)
 {
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00000000), 0);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00000001), 1);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00000010), 2);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00000100), 3);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00001000), 4);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00010000), 5);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b00100000), 6);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b01000000), 7);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b10000000), 8);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x00U)), 0);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x01U)), 1);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x02U)), 2);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x04U)), 3);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x08U)), 4);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x10U)), 5);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x20U)), 6);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x40U)), 7);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x80U)), 8);
 
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0000000100000000), 9);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0000001000000000), 10);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0000010000000000), 11);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0000100000000000), 12);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0001000000000000), 13);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0010000000000000), 14);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b0100000000000000), 15);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b1000000000000000), 16);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x0100U)), 9);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x0200U)), 10);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x0400U)), 11);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x0800U)), 12);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x1000U)), 13);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x2000U)), 14);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x4000U)), 15);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x8000U)), 16);
 
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b000000010000000000000000), 17);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b000000100000000000000000), 18);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b000001000000000000000000), 19);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b000010000000000000000000), 20);
-	EXPECT_EQ(Internal::CalcNumOfBits<>(0b000100000000000000000000), 21);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x010000U)), 17);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x020000U)), 18);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x040000U)), 19);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x080000U)), 20);
+	EXPECT_EQ(Internal::BitWidthChar(char32_t(0x100000U)), 21);
+}
+
+GTEST_TEST(TestUtf, EnsureByteSize)
+{
+	// unsigned
+
+	auto tprog1 = [](){
+		Internal::EnsureByteSize<1>(static_cast<uint8_t>(0xFF));
+	};
+	EXPECT_NO_THROW(tprog1());
+
+	auto tprog2 = [](){
+		Internal::EnsureByteSize<1>(static_cast<uint32_t>(0xFF0000));
+	};
+	EXPECT_THROW(tprog2(), UtfConversionException);
+
+	// signed
+
+	auto tprog3 = [](){
+		Internal::EnsureByteSize<1>(static_cast<char>(-1));
+	};
+	EXPECT_NO_THROW(tprog3());
+
+	auto tprog4 = [](){
+		Internal::EnsureByteSize<1>(static_cast<int32_t>(-1));
+	};
+	EXPECT_THROW(tprog4(), UtfConversionException);
 }
 
 GTEST_TEST(TestUtf, CalcNumContBytes)
 {
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00000000), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00000001), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00000010), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00000100), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00001000), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00010000), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b00100000), 0);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b01000000), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x00U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x01U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x02U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x04U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x08U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x10U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x20U), 0);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x40U), 0);
 
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b10000000), 1);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0000000100000000), 1);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0000001000000000), 1);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0000010000000000), 1);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x80U), 1);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x0100U), 1);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x0200U), 1);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x0400U), 1);
 
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0000100000000000), 2);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0001000000000000), 2);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0010000000000000), 2);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b0100000000000000), 2);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b1000000000000000), 2);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x0800U), 2);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x1000U), 2);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x2000U), 2);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x4000U), 2);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x8000U), 2);
 
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b000000010000000000000000), 3);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b000000100000000000000000), 3);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b000001000000000000000000), 3);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b000010000000000000000000), 3);
-	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0b000100000000000000000000), 3);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x010000U), 3);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x020000U), 3);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x040000U), 3);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x080000U), 3);
+	EXPECT_EQ(Internal::CalcUtf8NumContNeeded(0x100000U), 3);
 
-	EXPECT_THROW(Internal::CalcUtf8NumContNeeded(0xD800);, UtfConversionException);
-	EXPECT_THROW(Internal::CalcUtf8NumContNeeded(0xDFFF);, UtfConversionException);
+	EXPECT_THROW(Internal::CalcUtf8NumContNeeded(0xD800U);,
+		UtfConversionException);
+	EXPECT_THROW(Internal::CalcUtf8NumContNeeded(0xDFFFU);,
+		UtfConversionException);
 }
 
 GTEST_TEST(TestUtf, CodePtToUtf8)
