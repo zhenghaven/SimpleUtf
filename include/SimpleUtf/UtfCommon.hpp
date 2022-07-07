@@ -28,6 +28,7 @@
 #endif
 
 #include <cstdint>
+#include <cstring>
 
 #include <iterator>
 #include <limits>
@@ -181,6 +182,8 @@ inline
 SIMPLEUTF_BITOPS_CONSTEXPR
 size_t BitWidthChar<char32_t>(const char32_t& x) noexcept
 {
+	static_assert(!IsSigned<char32_t>::value,
+		"char32_t must be an unsigned type");
 	return BitWidth(static_cast<uint32_t>(x));
 }
 
