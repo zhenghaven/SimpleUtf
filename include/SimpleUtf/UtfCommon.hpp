@@ -411,7 +411,7 @@ struct AsciiTraitsImpl<_ValType, false>
 
 	static constexpr bool IsAByte(const _ValType& val)
 	{
-		return val <= std::numeric_limits<uint8_t>::max();
+		return val <= (std::numeric_limits<uint8_t>::max)();
 	}
 
 	static constexpr bool IsPrintable(const _ValType& val)
@@ -455,9 +455,9 @@ struct AsciiTraitsImpl<_ValType, true>
 		return
 			std::numeric_limits<_ValType>::digits >= 8 ?
 				(0 <= val &&
-					(val <= std::numeric_limits<uint8_t>::max())) :
-				((std::numeric_limits<signed char>::min() <= val) &&
-					(val <= std::numeric_limits<signed char>::max()));
+					(val <= (std::numeric_limits<uint8_t>::max)())) :
+				(((std::numeric_limits<signed char>::min)() <= val) &&
+					(val <= (std::numeric_limits<signed char>::max)()));
 	}
 
 	static
